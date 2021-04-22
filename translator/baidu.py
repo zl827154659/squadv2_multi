@@ -3,6 +3,8 @@ import requests
 import execjs
 import re
 
+import timeout_decorator
+
 
 class Baidu(object):
 
@@ -117,6 +119,8 @@ class Baidu(object):
         data['token'] = self.get_token()
         return data
 
+    # 增加timeout
+    @timeout_decorator.timeout(10, use_signals=False)
     def translate(self, from_lan, to_lan, text):
         self.data = self.get_data(from_lan, to_lan, text)
         s = requests.session()

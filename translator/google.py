@@ -5,6 +5,9 @@ import urllib.request
 import urllib.parse
 import requests
 import execjs
+import logging
+
+import timeout_decorator
 
 
 class Google():
@@ -24,6 +27,7 @@ class Google():
         self.url = 'http://translate.google.cn/translate_a/single'
         self.session = requests.Session()
         self.session.keep_alive = False
+        self.logger = logging.getLogger(__name__)
 
     def getTk(self, text):
         return self.get_ctx().call("TL", text)
@@ -105,6 +109,7 @@ class Google():
         except Exception as e:
             return None
 
+    @timeout_decorator.timeout(10, use_signals=False)
     def translate(self, from_lan, to_lan, text):
         tk = self.getTk(text)
         url = self.buildUrl(text, tk, from_lan, to_lan)
