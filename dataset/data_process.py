@@ -44,22 +44,22 @@ def multi_translate(source_text: str, output_file, dataset, counter: Counter, qa
                 mutex.release()
                 with open(output_file, 'w', encoding='utf-8') as f:
                     json.dump(dataset, f)
-                    print(f'saved file for counted 100 times :{output_file}')
+                print(f'{threading.currentThread().name}: saved file for counted 100 times :{output_file}')
             else:
                 mutex.release()
 
             # result_text = translate(query_text).strip()
             result_text = gg.translate('en', 'zh-CN', source_text).pop().strip()
         except Exception as e:
-            print(f'first google error : {e}, try baidu soon')
+            print(f'{threading.currentThread().name}: first google error : {e}, try baidu soon')
             try:
                 result_text = bd.translate('en', 'zh', source_text).strip()
             except Exception as e:
-                print(f'baidu error again : {e}, try another')
+                print(f'{threading.currentThread().name}: baidu error again : {e}, try another')
                 try:
                     result_text = ts_google_translate(source_text, if_use_cn_host=True, to_language='zh-CN')
                 except Exception as e:
-                    print(f'error again : {e}, try soon')
+                    print(f'{threading.currentThread().name}: error again : {e}, try soon')
                     sleep(10)
     qa['zh_question'] = result_text
 
@@ -149,7 +149,7 @@ def multi_data_process(file_path, output_file):
 
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(dataset, f)
-        print(f'final saved file :{output_file}')
+    print(f'final saved file :{output_file}')
 
 
 if __name__ == "__main__":

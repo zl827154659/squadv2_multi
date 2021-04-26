@@ -90,6 +90,9 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
             doc_tokens = []
             char_to_word_offset = []
             prev_is_whitespace = True
+
+            # doc_tokens是一个将文本按空格划分的数组，结果类似于doc='今天天气好 我要去踢球', doc_tokens=['今天天气好', '我要去踢球']
+            # char_to_word_offset则是将每个字符对应到doc_token所属的下标中，空格对应在前一个下标中，如[0,0,0,0,0, 0, 1,1,1,1,1]
             for c in paragraph_text:
                 if is_whitespace(c):
                     prev_is_whitespace = True
@@ -104,7 +107,10 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
             for qa in paragraph["qas"]:
                 qas_id = qa["id"]
                 # question_text = qa['question']
-                question_text = qa["zh_question"]
+                try:
+                    question_text = qa['zh_question']
+                except KeyError:
+                    continue
                 start_position = None
                 end_position = None
                 orig_answer_text = None
@@ -128,6 +134,8 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
                         #
                         # Note that this means for training mode, every example is NOT
                         # guaranteed to be preserved.
+
+                        # actual_text相当于是还原了带空格的文本(只包含有答案的那部分)
                         actual_text = " ".join(doc_tokens[start_position:(end_position + 1)])
                         cleaned_answer_text = " ".join(
                             whitespace_tokenize(orig_answer_text))

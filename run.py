@@ -3,14 +3,18 @@ import copy
 import logging
 import os
 import torch
+from torch.utils.data import SequentialSampler, DistributedSampler, DataLoader
+from tqdm import tqdm
 from transformers import set_seed, BertForQuestionAnswering, BertTokenizer
-from squad import load_and_cache_examples, train, final_evaluate, InputFeatures
+from squad import load_and_cache_examples
+from train import train
+from evaluate_ray import final_evaluate
 
 logger = logging.getLogger(__name__)
 
 # model_name = 'hfl/chinese-bert-wwm'
 # model_name = '../result/'
-model_name = 'uer/roberta-base-chinese-extractive-qa'
+model_name = 'bert-base-multilingual-cased'
 data_name = 'cmrc2018'
 
 
@@ -54,9 +58,9 @@ def main():
     parser.add_argument("--preview_features", action='store_true',
                         help="whether to preview the features converted")
 
-    parser.add_argument("--per_gpu_train_batch_size", default=4, type=int,
+    parser.add_argument("--per_gpu_train_batch_size", default=2, type=int,
                         help="Batch size per GPU/CPU for training.")
-    parser.add_argument("--per_gpu_eval_batch_size", default=16, type=int,
+    parser.add_argument("--per_gpu_eval_batch_size", default=4, type=int,
                         help="Batch size per GPU/CPU for evaluation.")
     parser.add_argument("--learning_rate", default=3e-5, type=float,
                         help="The initial learning rate for Adam.")
